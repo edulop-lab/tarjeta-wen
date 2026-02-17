@@ -104,7 +104,7 @@
         canvas#fx {
             position: fixed;
             inset: 0;
-            z-index: 1;
+            z-index: 100;
             pointer-events: none;
         }
 
@@ -394,7 +394,7 @@
             border-radius: 14px;
             font-size: 13px;
             opacity: 0;
-            z-index: 5;
+            z-index: 200;
             pointer-events: none;
             transition: opacity .22s ease, transform .22s ease;
             max-width: min(92vw, 520px);
@@ -432,7 +432,7 @@
                     <span class="dot"></span>
                     <span>Para mi esposa 💞</span>
                 </div>
-                <audio id="audioBirthday" src="saavane-happy-birthday-254480.mp3" loop></audio>
+                <audio id="audioBirthday" src="./saavane-happy-birthday-254480.mp3" preload="auto" loop></audio>
 
                 <div class="controls">
                     <button class="iconBtn" id="btnMusic" aria-label="Música">
@@ -500,8 +500,8 @@
             </div>
 
             <div class="chips" aria-label="Botones bonitos">
-                <button class="chip" data-text="Mi alegría 😊 🕊️ 🏡">Mi alegría 😊 🕊️ 🏡</button>
-                <button class="chip" data-text="Mi alegría 😊 🌙">Mi alegría 😊 🌙</button>
+                <button class="chip" data-text="Mi tesoro 💖">Mi tesoro 💖</button>
+                <button class="chip" data-text="Mi inspiración ✨">Mi inspiración ✨</button>
                 <button class="chip" data-text="Mi alegría 😊">Mi alegría 😊</button>
             </div>
 
@@ -810,12 +810,20 @@
         const btnMusic = document.getElementById('btnMusic');
         const audioBirthday = document.getElementById('audioBirthday');
 
+        // Reset volume
+        audioBirthday.volume = 0.5;
+
         btnMusic.addEventListener('click', () => {
             if (audioBirthday.paused) {
-                audioBirthday.play().catch(e => console.log("Interacción requerida para audio"));
-                showToast('🎵 ¡Feliz Cumpleaños! ON');
-                launchPastelitos({ count: 100 });
-                fireConfetti(60);
+                audioBirthday.play()
+                    .then(() => {
+                        showToast('🎵 ¡Feliz Cumpleaños! ON');
+                        launchPastelitos({ count: 100 });
+                        fireConfetti(60);
+                    })
+                    .catch(() => {
+                        showToast('❌ Toca de nuevo para escuchar');
+                    });
             } else {
                 audioBirthday.pause();
                 showToast('🔇 Música: OFF');
