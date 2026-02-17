@@ -92,15 +92,46 @@
 
         @keyframes floaty {
             0% {
-                transform: translate(0, 0) scale(1);
+                transform: translate(0, 0) scale(1.02) rotate(0deg);
             }
 
             50% {
-                transform: translate(16px, -18px) scale(1.03);
+                transform: translate(25px, -30px) scale(1.08) rotate(3deg);
             }
 
             100% {
-                transform: translate(-10px, 14px) scale(.98);
+                transform: translate(-15px, 20px) scale(0.96) rotate(-2deg);
+            }
+        }
+
+        @keyframes floatCard {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-8px) rotate(0.5deg);
+            }
+
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: var(--shadow2);
+            }
+
+            50% {
+                transform: scale(1.04);
+                box-shadow: 0 20px 50px rgba(255, 8, 68, .35);
+            }
+
+            100% {
+                transform: scale(1);
+                box-shadow: var(--shadow2);
             }
         }
 
@@ -127,8 +158,8 @@
             overflow: hidden;
             transform: translateY(10px);
             opacity: 0;
-            animation: popIn .95s cubic-bezier(.2, .9, .2, 1) forwards;
-            transition: transform .4s cubic-bezier(.2, .8, .2, 1);
+            animation: popIn .95s cubic-bezier(.2, .9, .2, 1) forwards, floatCard 6s ease-in-out infinite 1s;
+            transition: transform .4s cubic-bezier(.2, .8, .2, 1), box-shadow .4s ease;
         }
 
         .card:hover {
@@ -313,6 +344,7 @@
             color: white;
             background: linear-gradient(90deg, var(--p1), var(--p2));
             box-shadow: var(--shadow2);
+            animation: pulse 3s ease-in-out infinite;
         }
 
         .btn.ghost {
@@ -689,17 +721,19 @@
         const ambient = [];
         function seedAmbient() {
             ambient.length = 0;
-            const count = Math.min(16, Math.max(10, Math.floor(innerWidth / 80)));
+            const count = Math.min(50, Math.max(30, Math.floor(innerWidth / 30)));
             for (let i = 0; i < count; i++) {
                 ambient.push({
                     x: rand(0, innerWidth),
                     y: rand(0, innerHeight),
-                    s: rand(10, 22),
-                    vy: rand(-0.22, -0.08),
-                    drift: rand(-0.12, 0.12),
-                    r: rand(-0.7, 0.7),
-                    a: rand(0.25, 0.55),
-                    hue: rand(330, 360)
+                    s: rand(12, 32),
+                    vy: rand(-0.35, -0.12),
+                    drift: rand(-0.25, 0.25),
+                    r: rand(-1, 1),
+                    vr: rand(-0.01, 0.01),
+                    a: rand(0.3, 0.65),
+                    hue: rand(330, 360),
+                    type: Math.random() > 0.82 ? 'bear' : 'heart'
                 });
             }
         }
@@ -734,22 +768,34 @@
             // Ambient hearts
             for (const h of ambient) {
                 h.y += h.vy;
-                h.x += Math.sin((t / 90) + h.x / 120) * 0.12 + h.drift;
-                if (h.y < -30) { h.y = innerHeight + 30; h.x = rand(0, innerWidth); }
+                h.r += h.vr || 0;
+                h.x += Math.sin((t / 70) + h.x / 100) * 0.22 + h.drift;
+                if (h.y < -50) { h.y = innerHeight + 50; h.x = rand(0, innerWidth); }
                 ctx.globalAlpha = h.a;
-                const grad = ctx.createRadialGradient(h.x, h.y, 1, h.x, h.y, h.s * 1.2);
-                grad.addColorStop(0, `hsla(${h.hue}, 90%, 70%, .55)`);
-                grad.addColorStop(1, `hsla(${h.hue}, 90%, 70%, 0)`);
-                ctx.fillStyle = grad;
-                ctx.beginPath();
-                ctx.arc(h.x, h.y, h.s * 1.25, 0, Math.PI * 2);
-                ctx.fill();
+                if (h.type === 'bear') {
+                    ctx.font = `${h.s * 1.5}px serif`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.save();
+                    ctx.translate(h.x, h.y);
+                    ctx.rotate(h.r);
+                    ctx.fillText('🧸', 0, 0);
+                    ctx.restore();
+                } else {
+                    const grad = ctx.createRadialGradient(h.x, h.y, 1, h.x, h.y, h.s * 1.5);
+                    grad.addColorStop(0, `hsla(${h.hue}, 90%, 70%, .55)`);
+                    grad.addColorStop(1, `hsla(${h.hue}, 90%, 70%, 0)`);
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(h.x, h.y, h.s * 1.25, 0, Math.PI * 2);
+                    ctx.fill();
 
-                ctx.fillStyle = `hsla(${h.hue}, 92%, 62%, .65)`;
-                ctx.save();
-                heartPath(h.x, h.y, h.s / 18, h.r + Math.sin(t / 120) * 0.08);
-                ctx.fill();
-                ctx.restore();
+                    ctx.fillStyle = `hsla(${h.hue}, 92%, 62%, .65)`;
+                    ctx.save();
+                    heartPath(h.x, h.y, h.s / 18, h.r + Math.sin(t / 120) * 0.08);
+                    ctx.fill();
+                    ctx.restore();
+                }
             }
 
             // Burst hearts
@@ -814,7 +860,7 @@
             layer.style.cssText = "position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:9999;";
             document.body.appendChild(layer);
 
-            const emojis = ["🎂", "🧁", "🎉", "✨", "💖", "🍰", "🎁", "🎈"];
+            const emojis = ["🎂", "🧁", "🎉", "✨", "💖", "🍰", "🎁", "🎈", "🧸", "🐻", "💌"];
             const w = window.innerWidth, h = window.innerHeight;
 
             for (let i = 0; i < count; i++) {
