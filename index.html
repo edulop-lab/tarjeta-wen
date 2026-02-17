@@ -645,7 +645,7 @@
             ctx.restore();
         }
 
-        function burstHearts(n = 18) {
+        function burstHearts(n = 45) {
             const cx = innerWidth / 2 + rand(-30, 30);
             const cy = innerHeight / 2 + rand(-80, 20);
             for (let i = 0; i < n; i++) {
@@ -655,12 +655,12 @@
                     vx: rand(-1.6, 1.6),
                     vy: rand(-3.2, -1.2),
                     g: rand(0.04, 0.08),
-                    s: rand(9, 18),
+                    s: rand(12, 24),
                     r: rand(-0.6, 0.6),
                     vr: rand(-0.05, 0.05),
                     a: 1,
                     hue: rand(330, 360),
-                    life: rand(70, 110)
+                    life: rand(100, 160)
                 });
             }
         }
