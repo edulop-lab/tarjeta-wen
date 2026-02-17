@@ -6,21 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#ff5a87">
     <title>Feliz Cumpleaños, Wendy 💖</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --p1: #ff3d77;
-            --p2: #ff7aa7;
+            --p1: #ff0844;
+            --p2: #ffb199;
             --p3: #ffd1dc;
-            --bg1: #ff9a9e;
-            --bg2: #fad0c4;
-            --bg3: #fbc2eb;
+            --bg1: #ff758c;
+            --bg2: #ff7eb3;
+            --bg3: #eb8fbe;
             --ink: #1a1a1a;
             --muted: #5d5d5d;
-            --glass: rgba(255, 255, 255, .55);
-            --glass2: rgba(255, 255, 255, .30);
-            --shadow: 0 28px 70px rgba(0, 0, 0, .18);
-            --shadow2: 0 14px 40px rgba(255, 61, 119, .18);
-            --radius: 28px;
+            --glass: rgba(255, 255, 255, .65);
+            --glass2: rgba(255, 255, 255, .35);
+            --shadow: 0 32px 80px rgba(0, 0, 0, .22);
+            --shadow2: 0 16px 45px rgba(255, 8, 68, .25);
+            --radius: 32px;
         }
 
         * {
@@ -35,12 +38,12 @@
 
         body {
             margin: 0;
-            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            font-family: 'Outfit', sans-serif;
             color: var(--ink);
             overflow: hidden;
             background:
-                radial-gradient(1200px 700px at 20% 10%, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 60%),
-                radial-gradient(900px 600px at 80% 20%, rgba(255, 255, 255, .45), rgba(255, 255, 255, 0) 55%),
+                radial-gradient(1200px 700px at 20% 10%, rgba(255, 255, 255, .6), rgba(255, 255, 255, 0) 60%),
+                radial-gradient(900px 600px at 80% 20%, rgba(255, 255, 255, .5), rgba(255, 255, 255, 0) 55%),
                 linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
             background-size: 140% 140%;
             animation: bgShift 10s ease-in-out infinite alternate;
@@ -116,15 +119,20 @@
 
         .card {
             border-radius: var(--radius);
-            background: linear-gradient(180deg, rgba(255, 255, 255, .75), rgba(255, 255, 255, .45));
-            border: 1px solid rgba(255, 255, 255, .55);
+            background: linear-gradient(180deg, rgba(255, 255, 255, .82), rgba(255, 255, 255, .55));
+            border: 1px solid rgba(255, 255, 255, .7);
             box-shadow: var(--shadow);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             overflow: hidden;
             transform: translateY(10px);
             opacity: 0;
-            animation: popIn .9s cubic-bezier(.2, .9, .2, 1) forwards;
+            animation: popIn .95s cubic-bezier(.2, .9, .2, 1) forwards;
+            transition: transform .4s cubic-bezier(.2, .8, .2, 1);
+        }
+
+        .card:hover {
+            transform: translateY(-4px) scale(1.01);
         }
 
         @keyframes popIn {
@@ -432,7 +440,7 @@
                     <span class="dot"></span>
                     <span>Para mi esposa 💞</span>
                 </div>
-                <audio id="audioBirthday" src="./saavane-happy-birthday-254480.mp3" preload="auto" loop></audio>
+                <audio id="audioBirthday" src="saavane-happy-birthday-254480.mp3" preload="auto" loop></audio>
 
                 <div class="controls">
                     <button class="iconBtn" id="btnMusic" aria-label="Música">
@@ -482,7 +490,23 @@
                 <div class="page" data-page="2">
                     <div class="name">Mi persona 💖 💖</div>
                     <p class="message">
-                        Te amo con todo mi corazón.
+                        Eres mi motor, la razón de mis sonrisas y mi compañera de vida.
+                        Te admiro tanto por tu fuerza y tu gran corazón.
+                    </p>
+                </div>
+
+                <div class="page" data-page="3">
+                    <div class="name">Siempre juntos ✨</div>
+                    <p class="message">
+                        Que nunca te falte la magia en los ojos ni la risa en el alma.
+                        Estaré a tu lado para celebrar cada uno de tus sueños.
+                    </p>
+                </div>
+
+                <div class="page" data-page="4">
+                    <div class="name">Te amo con todo mi corazón 💗</div>
+                    <p class="message">
+                        Gracias por ser tú, Wendy.
                         <br />— Hoy, mañana y siempre.
                     </p>
                 </div>
@@ -491,6 +515,8 @@
                     <span class="dot active" data-dot="0"></span>
                     <span class="dot" data-dot="1"></span>
                     <span class="dot" data-dot="2"></span>
+                    <span class="dot" data-dot="3"></span>
+                    <span class="dot" data-dot="4"></span>
                 </div>
             </section>
 
@@ -536,7 +562,7 @@
         document.getElementById('btnNext').addEventListener('click', () => {
             setPage(idx + 1);
             burstHearts(18);
-            if (idx === 2) fireConfetti(110);
+            if (idx === dots.length - 1) fireConfetti(110);
         });
 
         // Allow swipe on mobile (left/right)
@@ -821,7 +847,7 @@
                         launchPastelitos({ count: 100 });
                         fireConfetti(60);
                     })
-                    .catch(() => {
+                    .catch(e => {
                         showToast('❌ Toca de nuevo para escuchar');
                     });
             } else {
@@ -834,7 +860,6 @@
         window.addEventListener('load', () => {
             setTimeout(() => launchPastelitos({ count: 120 }), 800);
         });
-
 
     </script>
 
