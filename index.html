@@ -432,6 +432,7 @@
                     <span class="dot"></span>
                     <span>Para mi esposa 💞</span>
                 </div>
+                <audio id="audioBirthday" src="saavane-happy-birthday-254480.mp3" loop></audio>
 
                 <div class="controls">
                     <button class="iconBtn" id="btnMusic" aria-label="Música">
@@ -780,115 +781,6 @@
         // Start with a gentle wow
         setTimeout(() => { burstHearts(24); fireConfetti(120); }, 550);
 
-        // --- Happy Birthday Music & FX (WebAudio) ---
-        const Birthday = (() => {
-            const melody = [
-                ["G4", 1], ["G4", 1], ["A4", 2], ["G4", 2], ["C5", 2], ["B4", 4],
-                ["G4", 1], ["G4", 1], ["A4", 2], ["G4", 2], ["D5", 2], ["C5", 4],
-                ["G4", 1], ["G4", 1], ["G5", 2], ["E5", 2], ["C5", 2], ["B4", 2], ["A4", 4],
-                ["F5", 1], ["F5", 1], ["E5", 2], ["C5", 2], ["D5", 2], ["C5", 4],
-            ];
-
-            const noteToFreq = (note) => {
-                const A4 = 440;
-                const map = { C: 0, "C#": 1, Db: 1, D: 2, "D#": 3, Eb: 3, E: 4, F: 5, "F#": 6, Gb: 6, G: 7, "G#": 8, Ab: 8, A: 9, "A#": 10, Bb: 10, B: 11 };
-                const m = note.match(/^([A-G])(#|b)?(\d)$/);
-                if (!m) return 0;
-                const key = m[1].toUpperCase() + (m[2] || "");
-                const oct = parseInt(m[3], 10);
-                const semisFromC0 = map[key] + (oct * 12);
-                const semisFromA4 = semisFromC0 - (map["A"] + 4 * 12);
-                return A4 * Math.pow(2, semisFromA4 / 12);
-            };
-
-            let ctx, master, isPlaying = false, stopFlag = false;
-
-            const ensureCtx = () => {
-                if (!ctx) {
-                    ctx = new (window.AudioContext || window.webkitAudioContext)();
-                    master = ctx.createGain();
-                    master.gain.value = 0.15;
-                    master.connect(ctx.destination);
-                }
-                return ctx;
-            };
-
-            const playTone = (freq, startTime, duration) => {
-                const o = ctx.createOscillator();
-                const g = ctx.createGain();
-                o.type = "sine";
-                o.frequency.setValueAtTime(freq, startTime);
-                g.gain.setValueAtTime(0.0001, startTime);
-                g.gain.exponentialRampToValueAtTime(1.0, startTime + 0.02);
-                g.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
-                o.connect(g); g.connect(master);
-                o.start(startTime); o.stop(startTime + duration + 0.02);
-            };
-
-            const playHappyBirthday = async () => {
-                stopFlag = false;
-                ensureCtx();
-                if (ctx.state === "suspended") await ctx.resume();
-                const bpm = 135;
-                const beat = 60 / bpm;
-                let t = ctx.currentTime + 0.05;
-
-                const chordGain = ctx.createGain();
-                chordGain.gain.value = 0.06;
-                chordGain.connect(master);
-
-                const playChord = (notes, time, dur) => {
-                    notes.forEach(n => {
-                        const o = ctx.createOscillator();
-                        o.type = "triangle";
-                        o.frequency.setValueAtTime(noteToFreq(n), time);
-                        const g = ctx.createGain();
-                        g.gain.setValueAtTime(0.0001, time);
-                        g.gain.exponentialRampToValueAtTime(1.0, time + 0.02);
-                        g.gain.exponentialRampToValueAtTime(0.0001, time + dur);
-                        o.connect(g); g.connect(chordGain);
-                        o.start(time); o.stop(time + dur + 0.02);
-                    });
-                };
-
-                const harmony = [
-                    ["G3", "B3", "D4"], ["G3", "B3", "D4"], ["D3", "F#3", "A3"], ["G3", "B3", "D4"],
-                    ["C3", "E3", "G3"], ["G3", "B3", "D4"], ["D3", "F#3", "A3"], ["G3", "B3", "D4"],
-                ];
-
-                let h = 0;
-                for (let i = 0; i < melody.length; i++) {
-                    if (stopFlag) break;
-                    const [note, beats] = melody[i];
-                    const dur = beat * beats * 0.95;
-                    if (i % 6 === 0) {
-                        playChord(harmony[h % harmony.length], t, beat * 6 * 0.98);
-                        h++;
-                    }
-                    playTone(noteToFreq(note), t, dur);
-                    t += beat * beats;
-                }
-
-                if (!stopFlag) {
-                    setTimeout(() => { if (!stopFlag && isPlaying) playHappyBirthday(); }, 800);
-                }
-            };
-
-            return {
-                toggle: async () => {
-                    if (!isPlaying) {
-                        isPlaying = true;
-                        await playHappyBirthday();
-                        return true;
-                    } else {
-                        stopFlag = true;
-                        isPlaying = false;
-                        return false;
-                    }
-                },
-                ensureCtx
-            };
-        })();
 
         // --- Cake & Emoji Rain ---
         function launchPastelitos({ count = 120, duration = 5200 } = {}) {
@@ -916,13 +808,16 @@
 
         // --- Music UI Connection ---
         const btnMusic = document.getElementById('btnMusic');
-        btnMusic.addEventListener('click', async () => {
-            const isNowPlaying = await Birthday.toggle();
-            if (isNowPlaying) {
+        const audioBirthday = document.getElementById('audioBirthday');
+
+        btnMusic.addEventListener('click', () => {
+            if (audioBirthday.paused) {
+                audioBirthday.play().catch(e => console.log("Interacción requerida para audio"));
                 showToast('🎵 ¡Feliz Cumpleaños! ON');
                 launchPastelitos({ count: 100 });
                 fireConfetti(60);
             } else {
+                audioBirthday.pause();
                 showToast('🔇 Música: OFF');
             }
         });
@@ -930,7 +825,6 @@
         // Auto-launch cake on load
         window.addEventListener('load', () => {
             setTimeout(() => launchPastelitos({ count: 120 }), 800);
-            try { Birthday.ensureCtx(); } catch (e) { }
         });
 
 
